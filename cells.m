@@ -17,7 +17,7 @@ cellarr(3, :) = rk2(alpha, t0, tend, dt, cells0, 0);
 cellarr(5, :) = rk4(alpha, t0, tend, dt, cells0, 0);
 titles = ["Euler's Method", "Euler's Error", "RK-2 Method", "RK-2 Error", "RK-4 Method", "RK-4 Error"];
 for idx = 2:2:6
-  cellarr(idx, :) = expcells - cellarr(idx - 1, :);
+  cellarr(idx, :) = abs(expcells - cellarr(idx - 1, :));
 end
 
 %%

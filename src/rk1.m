@@ -14,7 +14,7 @@ function cells = rk1(alpha, t0, tend, dt, y0, model)
       for i = 1:niter
         dCa = dt * (alpha(2) * cells(2, i) - alpha(1) * cells(1, i));
         cells(1, i + 1) = cells(1, i) + dCa;
-        cells(2, i + 1) = cells(1, i) - dCa;
+        cells(2, i + 1) = cells(2, i) - dCa;
       end
   end
 end

@@ -1,0 +1,55 @@
+First Order Reversible Reaction Concentration Solution:
+ - Analytical Solution
+ - Numerical Solutions 
+    - Euler's Method
+    - Runge Kutta 2nd Order Method
+    - Runge Kutta 4th Order Method
+
+ - File Structure:
+
+ - Derivation.pdf
+    - PDF defining the problem, derivation of the Analytical Solution and determining the differential equation required to pass to the numerical methods.
+
+ - src/
+    - rk1.m: 1st Order Runge Kutta or Euler's Method
+    - rk2.m: Runge Kutta 2nd Order Method
+    - rk4.m: Runge Kutta 2nd Order Method
+
+    - All the function files have been remodelled based on the cells definition used in the class:
+      - `cells` represents the output array for the Concentration
+      - `alpha` represents the forward and reverse rate constants: passed as an array ([kf, kr])
+      - `t0`: represents the starting time
+      - `tend`: represents the ending time
+      - `dt`: represents the time difference
+      - `y0`: represents the initial Concentration: passed as an array ([Ca0 and Ca*0])
+      - `model`: used in the switch case procedure: `0` for simple ODE(for cells-based problem), `1` for the reversible first order reaction kinetics.
+
+ - revrxn.m:
+
+     - t0, tend, dt, ca0, kf, kr: all the initial parameters being passed.
+
+     - `time`: time array, with `dt` amount of difference between each time step.
+
+     - `conc`: Concentration Matrix(used a matrix based storage for making it simpler for plotting)
+        - conc(1, :): Analytical Solution of Concentration of A
+        - conc(2, :): Analytical Solution of Concentration of A*
+        - conc(3, :): Euler's Method Solution of Concentration of A
+        - conc(4, :): Euler's Method of Concentration of A*
+        - conc(5, :): Runge Kutta 2nd Order Solution of Concentration of A
+        - conc(6, :): Runge Kutta 2nd Order Solution of Concentration of A*
+        - conc(7, :): Runge Kutta 4th Order Solution of Concentration of A
+        - conc(8, :): Runge Kutta 4th Order Solution of Concentration of A*
+
+     - `errors`: Errors Matrix(used a matric based storage for making it simpler for plotting)
+        - errors(1:2, :): Errors of Euler's Method(A, A*)
+        - errors(3:4, :): Errors of Runge Kutta 2nd Order Method(A, A*)
+        - errors(5:6, :): Errors of Runge Kutta 4th Order Method(A, A*)
+
+     - `plotconc`: Local function that takes in time array and Concentration matrix and plots them as a subplot.
+
+     - `ploterror`: Local function that takes in time array and group of errors matrix, and plots them as multiple subplots.
+        - In the title: there is also the total sum being displayed.
+          - Representation Used: "Error Euler's [Sum(Concentration(A)), Sum(Concentration(A*))]"
+
+ - Observations:
+    - 

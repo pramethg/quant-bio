@@ -51,5 +51,10 @@ First Order Reversible Reaction Concentration Solution:
         - In the title: there is also the total sum being displayed.
           - Representation Used: "Error Euler's [Sum(Concentration(A)), Sum(Concentration(A*))]"
 
- - Observations:
-    - 
+Observations:
+ - Euler's method has a strong agreement with the analytical solution of solving for the concentration of each of the chemical reacting species. 
+ - Even the Runge-Kutta 2nd order and  Runge-Kutta 4th order follow the same behavior, where there is a very minimal error with respect to the analytical solution(in the order of 1e-4 at each time step).
+ - The error calculated for each of the species(with respect to each order) actually coincides with each other. This could be attributed to the fact that the differential equations formed for each of the species are just additive inverses of each other.
+ - Running the code for the below mentioned parameters generates the figure with the results.
+ - One assumption made in the analytical solution was that there’s not A* present initially.
+

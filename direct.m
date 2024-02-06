@@ -1,7 +1,7 @@
 clc; clear; close all;
 
 time = [];
-tstop = 10000;
+tstop = 100;
 tspan = [0 tstop];
 time(1) = tspan(1);
 Xi = [100 0];
@@ -20,11 +20,15 @@ while (t < tstop)
   A = sum(Ch(:));
   tau = 1 / (A + 1e-5) * log(1 / (r1 + 1e-5));
   mu = find((cumsum(Ch) >= r2 * A), 1, 'first');
-  X(:, i) = reaction(X(:, i - 1), mu);
-  [H, Ch] = update_ch(C, X(:, i));
-  i = i + 1;
-  t = t + tau;
-  time(i) = t;
+  if isempty(mu)
+    continue
+  else
+    X(:, i) = reaction(X(:, i - 1), mu);
+    [H, Ch] = update_ch(C, X(:, i));
+    i = i + 1;
+    t = t + tau;
+    time(i) = t;
+  end
 end
 
 %%

@@ -104,13 +104,13 @@ function Xv = reaction(Xv, mu)
       Xv(2) = Xv(2) - 1;
   end
 end
+
 %% Function for Describing the ODE Behavior to the ODE-45 Solver
 function dydt = revrxn(t, y, C)
   dA1dt = C(2) * y(2) - C(1) * y(1);
   dA2dt = C(1) * y(1) - C(2) * y(2);
   dydt = [dA1dt; dA2dt];
 end
-
 
 %% Function to Update the C.H Matrix
 function [H, Ch] = update_ch(C, X)

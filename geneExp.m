@@ -1,7 +1,7 @@
 clc; clear; close all;
 addpath(genpath("./src/"));
 
-tstop = 100;
+tstop = 2500;
 tspan = [0 tstop];
 time = []; % Array to store the Time Values
 time(1) = tspan(1); % Initializing with 0
@@ -46,6 +46,7 @@ while (t < tstop)
     time(i) = t;
   end
 end
+X = X(:, 1:size(time, 2) - 1);
 
 %% ODE-45 Solver Solution
 [sGeneTime, sGeneConc] = ode45(@(t, y) geneExpression(t, y, C), time, Xi);
@@ -79,8 +80,8 @@ plot(1:length(tau_arr), movmean(tau_arr, 10), Color = "green");
 xlabel("Iteration #");
 ylabel("Tau (a.u.)");
 title(strcat("Tau Value, Average: ", num2str(mean(tau_arr))));
-xlim([0 length(tau_arr) + 100]);
-ylim([-0.5 1.5]);
+xlim([0 length(tau_arr) + 20]);
+legend(["Tau Value", "Moving Averaged(10) Tau Value"])
 
 %% Function for Gene Expression Reactions
 function Xv = reaction(Xv, mu)

@@ -1,24 +1,25 @@
 clc; clear; close all;
 addpath(genpath("./src/"));
 
-tstop = 2500;
+tstop = 8 * 60 * 60;
 tspan = [0 tstop];
 time = []; % Array to store the Time Values
 time(1) = tspan(1); % Initializing with 0
 Xi = [0 0]; % Iniitial Concentration Vector for mRNA and Protein
 X = zeros(length(Xi), tstop); % Counts Matrix Zero-Initialization
 X(:, 1) = Xi; % Initializing the First Time Step with Initial Counts
+b = 10; % Burst Size: b = k_p / gamma_r
 k_r = 0.01; % Transcription Rate
-k_p = 0.1; % Translation Rate
 gamma_r = 0.1; % mRNA Decay Rate
 gamma_p = 0.002; % Protein Decay Rate
+k_p = b * gamma_r; % Translation Rate
 C = [k_r k_p gamma_r gamma_p]; % Rate Constants Vector for Transcription, Translation, mRNA Decay, Protein Decay
 H = update_ch(C, Xi);
 Ch = C.*H'; % Compute the Initial Ch Vector
 i = 2; % Iteration Variable
 t = 0; % Time Variable used for deciding the stopping condition
 tau_arr = []; % Vector to store Tau-values
-colors = ["b", "g", "yellow", "cyan"];
+colors = ["blue", "magenta", "red", "cyan"];
 labels = ["Time", "Number of mRNA/Protein", "Error"];
 
 %% Main Loop for Direct Method Solution
@@ -47,7 +48,6 @@ while (t < tstop)
   end
 end
 X = X(:, 1:size(time, 2) - 1);
-
 %% ODE-45 Solver Solution
 [sGeneTime, sGeneConc] = ode45(@(t, y) geneExpression(t, y, C), time, Xi);
 % Error w.r.t. Direct Method and ODE-45 Solution
@@ -55,22 +55,25 @@ error = X' - sGeneConc(1:end - 1, :);
 
 %% Plot the Direct Method Solution
 figure;
-plot(time(:, 1:end - 1), X(1, :), "Color", "green");
+plot(time(:, 1:end - 1), X(1, :), "Color", "blue");
 hold on
-plot(time(:, 1:end - 1), X(2, :), "Color", "blue");
+plot(time(:, 1:end - 1), X(2, :), "Color", "green");
 legend(["#mRNA", "#Protein"]);
 xlabel("Time");
 ylabel("Number of mRNA/Protein");
+ylim([0, 120]);
 title("Direct Method");
 
 %% Plot Analyzing Differences Betweem Direct Method and ODE-45 Solution
 figure;
-subplot(1, 3, 1)
-matPlot(time(:, 1:end - 1), X, colors(1:2), labels(1:2), "Direct Method Solution");
-subplot(1, 3, 2)
-matPlot(sGeneTime, sGeneConc', colors(1:2), labels(1:2), "ODE45 Solution");
-subplot(1, 3, 3)
-matPlot(time(:, 1:end - 1), error', colors(3:4), labels([1, 3]), strcat("Sum of Errors(ODE45): ", num2str(sum(abs(error(:))))));
+subplot(2, 2, 1)
+matPlot(time(:, 1:end - 1), X, colors(1:2), labels(1:2), "Direct Method Solution", ["#mRNA", "#Protein"], [0, 120]);
+subplot(2, 2, 2)
+matPlot(sGeneTime, sGeneConc', colors(1:2), labels(1:2), "ODE45 Solution", ["#mRNA", "#Protein"], [0, 120]);
+subplot(2, 2, 3)
+matPlot(time(:, 1:end - 1), cat(1, X(2, :), sGeneConc(1:end - 1, 2)'), colors([3, 1]), ["Time", "Protein Number"], "Direct Method vs. ODE-45 Solution", ["Direct Method", "ODE-45"], [0, 120]);
+subplot(2, 2, 4)
+matPlot(time(:, 1:end - 1), error', colors([3, 1]), labels([1, 3]), strcat("Sum of Errors(ODE45): ", num2str(sum(abs(error(:))))));
 
 %% Plot Analyzing Tau-Value With Respect to Time
 figure;
@@ -111,7 +114,7 @@ function [H, Ch] = update_ch(C, X)
 end
 
 %% Plotting Function to Plot Counts/Numbers
-function matPlot(x, y, colors, labels, stitle)
+function matPlot(x, y, colors, labels, stitle, varargin)
   for i = 1:2
     plot(x, y(i, :), Color = colors(i));
     hold on;
@@ -119,6 +122,11 @@ function matPlot(x, y, colors, labels, stitle)
   xlabel(labels(1));
   ylabel(labels(2));
   title(stitle);
-  legend(["#mRNA", "#Protein"]);
+  if nargin > 5
+    legend(varargin{1});
+    ylim(varargin{2});
+  else
+    legend(["#mRNA", "#Protein"]);
+  end
   hold off;
 end

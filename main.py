@@ -35,7 +35,12 @@ def ode(args):
   plt.tight_layout()
   plt.show()
 
+def train(args):
+  pass
+
 if __name__ == "__main__":
   args = argparser().parse_args()
   if args.model == "ode":
     ode(args)
+  elif args.model == "":
+    train(args)

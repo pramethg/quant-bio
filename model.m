@@ -20,3 +20,20 @@ for idx = 1:3
   ylabel('Population Count');
 end
 sgtitle('COVID Population Dynamics');
+
+%%
+data = readtable('./data/expCells.csv');
+data = table2array(data);
+initialParameters = [0.00002, 0.15, 0.55, 5.5, 80, 900];
+nIters = 1e4;
+stepSize = 3e-4;
+[paramChain, acceptChain] = runMCMC(data, initialParameters, nIters, stepSize);
+nParams = size(paramChain, 2);
+
+fig = figure;
+for idx = 1:nParams
+  subplot(nParams, 1, idx);
+  plot(paramChain(:, idx));
+  xlabel('Iteration');
+  ylabel(sprintf('Parameter %d', idx));
+end

@@ -1,6 +1,6 @@
 function [dYdt] = modelCOVID(t, Y, parameters)
   T = Y(1); % UninfeCted T Cells
-  I = Y(2); % InfeCted Virus Cells
+  I = Y(2); % Infected Virus Cells
   V = Y(3); % Virus PartiCles
   % Parameters
   lambda = parameters(1);

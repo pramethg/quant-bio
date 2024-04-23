@@ -32,6 +32,3 @@ def gradientDescent(parameters, tSpan, Y0, data, lrate, epochs, paramBound):
       loss = costFunction(parameters, tSpan, Y0, data)
       print(f"Iteration - [{idx + 1}/{epochs}] Loss - {loss}")
   return parameters
-
-def stochasticGradientDescent(parameters, tSpan, Y0, data, lrate, epochs, paramBound):
-  pass

@@ -1,10 +1,13 @@
 import numpy as np
 import pandas as pd
+import jax.numpy as jnp
 import matplotlib.pyplot as plt
 
-def dataExp(fpath = '../data/expCells.csv', plot = 0):
+def dataExp(fpath = '../data/expCells.csv', plot = 0, jaxarr = 0):
   data = pd.read_csv(fpath)
   data = data.to_numpy()
+  if jaxarr:
+    data = jnp.array(data)
   if plot:
     titles = ['T Cells', 'I Cells', 'logV Cells']
     colors = ['r', 'b', 'g']

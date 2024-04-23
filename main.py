@@ -1,5 +1,6 @@
 import argparse
 import numpy as np
+import jax.numpy as jnp
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 from utils import *
@@ -56,19 +57,16 @@ def gradOptimizer(args):
     parameters = np.random.rand(6)
   else:
     parameters = [float(sidx) for sidx in (args.parameters).split(",")]
-  if args.model == "gd":
+  if args.model == "ngd":
     parameters = gradientDescent(parameters, tSpan, Y0, data[:, 1:], args.lrate, args.epochs, args.bounds)
-  elif args.model == "sgd":
-    parameters = stochasticGradientDescent(parameters, tSpan, Y0, data[:, 1:], args.lrate, args.epochs, args.bounds)
-  elif args.model == "rmsprop":
-    pass
-  elif args.model == "adam":
-    pass
   sol = solve_ivp(lambda t, Y: covidModel(t, Y, parameters), tSpan, Y0, dense_output = True)
   t = np.linspace(tSpan[0], tSpan[1], 300)
   Y = sol.sol(t)
   if args.plot:
     implot(t, Y, data, "ODE")
+  
+  def jaxOptimizer(args):
+    pass
 
 def mcmc(args):
   data = dataExp("./data/expCells.csv", 0)

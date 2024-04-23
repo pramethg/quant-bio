@@ -11,17 +11,14 @@ def argparser():
   parser.add_argument("--initial", type = str, default = "50, 600, 50000")
   parser.add_argument("--tspan", type = int, default = 60)
   parser.add_argument("--niters", type = int, default = 10000)
-  parser.add_argument("--stepsize", type = float, default = 3e-4)
+  parser.add_argument("--stepsize", type = float, default = 3e-5)
+  parser.add_argument("--plot", action = 'store_true')
+  parser.add_argument("--epochs", type = int, default = 300)
+  parser.add_argument("--lrate", type = float, default = 3e-5)
+  parser.add_argument("--rand", action = 'store_true')
   return parser
 
-def ode(args):
-  tspan = (0, args.tspan)
-  Y0 = [float(yidx) for yidx in (args.initial).split(",")]
-  parameters = [float(sidx) for sidx in (args.parameters).split(",")]
-  sol = solve_ivp(lambda t, Y: covidModel(t, Y, parameters), tspan, Y0, dense_output = True)
-  t = np.linspace(tspan[0], tspan[1], 300)
-  Y = sol.sol(t)
-  data = dataExp('./data/expCells.csv', 0)
+def implot(t, Y, data, legend = "ODE"):
   titles = ["T (Uninfected T Cells)", "I (Infected Virus Cells)", "logV (Virus Particles)"]
   colors = ["b", "g", "r"]
   plt.figure(figsize = (15, 5))
@@ -31,14 +28,47 @@ def ode(args):
       plt.plot(t, np.abs(np.log(Y[idx])), color = colors[idx])
     else:
       plt.plot(t, Y[idx], color = colors[idx])
-    plt.scatter(data[:, 0], data[:, idx], c = colors[idx])
+    plt.scatter(data[:, 0], data[:, idx + 1], c = colors[idx])
     plt.title(titles[idx])
     plt.xlabel("Time")
     plt.ylabel("Population Count")
-    plt.legend(['ODE', 'Experimental'])
+    plt.legend([legend, 'Experimental'])
   plt.suptitle("COVID Population Dynamics")
   plt.tight_layout()
   plt.show()
+
+def ode(args):
+  tSpan = (0, args.tspan)
+  Y0 = [float(yidx) for yidx in (args.initial).split(",")]
+  parameters = [float(sidx) for sidx in (args.parameters).split(",")]
+  sol = solve_ivp(lambda t, Y: covidModel(t, Y, parameters), tSpan, Y0, dense_output = True)
+  t = np.linspace(tSpan[0], tSpan[1], 300)
+  Y = sol.sol(t)
+  data = dataExp('./data/expCells.csv', 0)
+  if args.plot:
+    implot(t, Y, data)
+
+def gradOptimizer(args):
+  data = dataExp('./data/expCells.csv', 0)
+  tSpan = (0, args.tspan)
+  Y0 = [float(yidx) for yidx in (args.initial).split(",")]
+  if args.rand:
+    parameters = np.random.rand(6)
+  else:
+    parameters = [float(sidx) for sidx in (args.parameters).split(",")]
+  if args.model == "gd":
+    parameters = gradientDescent(parameters, tSpan, Y0, data[:, 1:], args.lrate, args.epochs, args.bounds)
+  elif args.model == "sgd":
+    parameters = stochasticGradientDescent(parameters, tSpan, Y0, data[:, 1:], args.lrate, args.epochs, args.bounds)
+  elif args.model == "rmsprop":
+    pass
+  elif args.model == "adam":
+    pass
+  sol = solve_ivp(lambda t, Y: covidModel(t, Y, parameters), tSpan, Y0, dense_output = True)
+  t = np.linspace(tSpan[0], tSpan[1], 300)
+  Y = sol.sol(t)
+  if args.plot:
+    implot(t, Y, data, "ODE")
 
 def mcmc(args):
   data = dataExp("./data/expCells.csv", 0)
@@ -58,9 +88,10 @@ def train(args):
 
 if __name__ == "__main__":
   args = argparser().parse_args()
+  args.bounds = [[0.000005, 0.05, 0.2, 2, 50, 750], [0.00006, 0.4, 1, 10, 120, 1200]]
   if args.model == "ode":
     ode(args)
   elif args.model == "mcmc":
     mcmc(args)
-  elif args.model == "":
-    train(args)
+  elif args.model in ["gd", "sgd", "rmsprop", "adam"]:
+    gradOptimizer(args)

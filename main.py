@@ -1,6 +1,7 @@
 import argparse
 import numpy as np
 import jax.numpy as jnp
+from jax import grad, jit
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 from utils import *
@@ -65,8 +66,21 @@ def gradOptimizer(args):
   if args.plot:
     implot(t, Y, data, "ODE")
   
-  def jaxOptimizer(args):
-    pass
+def jaxOptimizer(args):
+  data = dataExp('./data/expCells.csv', 0, 1)
+  tSpan = (0, args.tspan)
+  t = jnp.linspace(tSpan[0], tSpan[1], len(data))
+  if args.initial == "0":
+    Y0 = data[0, 1:]
+  else:
+    Y0 = jnp.array([float(yidx) for yidx in (args.initial).split(",")])
+  if args.rand:
+    parameters = jnp.array(np.random.rand(6))
+  else:
+    parameters = jnp.array([float(sidx) for sidx in (args.parameters).split(",")])
+  if args.model == "jgd":
+    parameters = gradientDescentJax(parameters, t, Y0, data[:, 1:], args.lrate, args.epochs)
+  print(parameters.shape)
 
 def mcmc(args):
   data = dataExp("./data/expCells.csv", 0)
@@ -91,5 +105,8 @@ if __name__ == "__main__":
     ode(args)
   elif args.model == "mcmc":
     mcmc(args)
+  elif args.model[0] == "j":
+    if args.model in ["jgd", "jsgd", "jrmsprop", "jadam"]:
+      jaxOptimizer(args)
   elif args.model in ["gd", "sgd", "rmsprop", "adam"]:
     gradOptimizer(args)

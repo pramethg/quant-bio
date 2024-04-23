@@ -1,4 +1,5 @@
-function [params_chain, acceptance_chain] = runMCMC(allData, params_initial, n_iterations, step_size)
+function [params_chain, acceptance_chain] = runMCMC(allData, params_initial, n_iterations, step_size, bounds)
+  tS = tic();
   % Allocate space for the parameter chain and acceptance history
   n_params = length(params_initial);
   params_chain = zeros(n_iterations, n_params);
@@ -7,14 +8,14 @@ function [params_chain, acceptance_chain] = runMCMC(allData, params_initial, n_i
   % Initialize the chain with the initial parameters
   params_chain(1, :) = params_initial;
   current_logLik = logLikelihood(allData, params_initial);
-  current_logPrior = priorFunction(params_initial);
+  current_logPrior = priorFunction(params_initial, bounds);
 
   % MCMC loop
   for i = 2:n_iterations
     % Propose new parameters by perturbing the current ones with a normal distribution
     params_proposal = params_chain(i-1, :) + normrnd(0, step_size, [1, n_params]);
     proposal_logLik = logLikelihood(allData, params_proposal);
-    proposal_logPrior = priorFunction(params_proposal);
+    proposal_logPrior = priorFunction(params_proposal, bounds);
 
     % Compute acceptance probability using the Metropolis-Hastings criterion
     % If proposal_logPrior is -Inf (proposal out of bounds), acceptance_prob will be 0
@@ -30,9 +31,15 @@ function [params_chain, acceptance_chain] = runMCMC(allData, params_initial, n_i
       params_chain(i, :) = params_chain(i-1, :);  % Reject the proposal, keep the current parameters
       % Note: acceptance_chain(i) remains false
     end
-    if mod(i, 500) == 0
+    if mod(i, 1000) == 0
       fprintf('Iterations - [%d/%d]\n', i, n_iterations);
     end
   end
   fprintf('Completed MCMC Iterations - [%d/%d]\n', n_iterations, n_iterations);
+  tE = toc(tS);
+  if tE < 60
+    fprintf('Processing Took %d Seconds\n', round(tE, 2));
+  else
+    fprintf('Processing Took %d Minutes %d Seconds\n', floor(tE / 60), rem(tE / 60, 60));
+  end
 end

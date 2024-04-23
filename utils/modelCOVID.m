@@ -3,12 +3,12 @@ function [dYdt] = modelCOVID(t, Y, parameters)
   I = Y(2); % Infected Virus Cells
   V = Y(3); % Virus PartiCles
   % Parameters
-  lambda = parameters(1);
+  beta = parameters(1);
   rho = parameters(2);
-  beta = parameters(3);
-  gamma = parameters(4);
-  n = parameters(5);
-  C = parameters(6);
+  gamma = parameters(3);
+  C = parameters(4);
+  lambda = parameters(5);
+  n = parameters(6);
   % Differential Equations
   dTdt = lambda - (rho * T) - (beta * T * V);
   dIdt = (beta * T * V) - (gamma * I);

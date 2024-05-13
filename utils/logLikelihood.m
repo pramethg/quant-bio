@@ -1,7 +1,7 @@
 function totalLogLik = logLikelihood(allData, parameters)
-  sigmaT = 4.5;
-  sigmaI = 0.5;
-  sigmalogV = 0.45;
+  sigmaT = 0.04;
+  sigmaI = 0.04;
+  sigmalogV = 0.04;
   time = allData(:, 1)'; 
   Y0 = allData(1, 2:end);
   [tModel, YModel] = ode45(@(t, Y) modelCOVID(t, Y, parameters), time, Y0);

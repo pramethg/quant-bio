@@ -31,7 +31,7 @@ function [params_chain, acceptance_chain] = runMCMC(allData, params_initial, n_i
       params_chain(i, :) = params_chain(i-1, :);  % Reject the proposal, keep the current parameters
       % Note: acceptance_chain(i) remains false
     end
-    if mod(i, 1000) == 0
+    if mod(i, 10000) == 0
       fprintf('Iterations - [%d/%d]\n', i, n_iterations);
     end
   end
